@@ -1,4 +1,4 @@
-package com.example.utils;
+package com.example.utils.handler;
 
 public interface ICustomTypeHandler {
   public static final ICustomTypeHandler PRIMITIVE_HANDLER_BYTE = new ICustomTypeHandler() {

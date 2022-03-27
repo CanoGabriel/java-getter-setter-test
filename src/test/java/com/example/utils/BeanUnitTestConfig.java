@@ -1,7 +1,14 @@
 package com.example.utils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.example.utils.annotation.IncludeCustomTypeHandler;
+import com.example.utils.exception.UnsupportedCustomTypeException;
+import com.example.utils.handler.ICustomTypeHandler;
+
+import org.reflections.Reflections;
 
 public class BeanUnitTestConfig {
   private Map<Class<?>, ICustomTypeHandler> customTypeMap = new HashMap<>();
@@ -10,12 +17,11 @@ public class BeanUnitTestConfig {
     return typeClass.isPrimitive() || customTypeMap.containsKey(typeClass);
   }
 
-  public ICustomTypeHandler getCustomTypeHandler(Class<?> typeClass) throws Exception {
+  public ICustomTypeHandler getCustomTypeHandler(Class<?> typeClass) throws UnsupportedCustomTypeException {
     if(isSupportedType(typeClass)){
       return customTypeMap.get(typeClass);
     }
-    // TODO create custom exception
-    throw new Exception(String.format("The type '%s' is not supported", typeClass));
+    throw new UnsupportedCustomTypeException(typeClass);
   }
 
   public void addCustomTypeHandler(Class<?> customTypeClass, ICustomTypeHandler handler){
@@ -52,6 +58,18 @@ public class BeanUnitTestConfig {
     addCustomTypeHandler(Short.class, ICustomTypeHandler.PRIMITIVE_HANDLER_SHORT);
 
     // TODO retrieve annotated handler
+    Reflections reflections = new Reflections(this.getClass().getPackageName());
+    for (Class<?> cl : reflections.getTypesAnnotatedWith(IncludeCustomTypeHandler.class)) {
+      IncludeCustomTypeHandler annotation = cl.getAnnotation(IncludeCustomTypeHandler.class);
+      System.out.printf("Found class: %s, with meta name: %s%n", cl.getSimpleName(), annotation.type());
+      
+      try {
+        addCustomTypeHandler(annotation.type(), (ICustomTypeHandler) cl.getConstructor().newInstance());
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+          | NoSuchMethodException | SecurityException e) {
+      }
+
+    }
   }
 }
 
