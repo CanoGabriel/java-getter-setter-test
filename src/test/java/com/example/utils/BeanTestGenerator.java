@@ -13,11 +13,20 @@ import java.util.Optional;
 import org.junit.jupiter.api.DynamicTest;
 
 public class BeanTestGenerator implements CustomTypeRegisterer {
-    Map<Class<?>, ICustomTypeHandler> customTypeConfig = new HashMap<>();
+    BeanUnitTestConfig configuration = new BeanUnitTestConfig();
+    // Map<Class<?>, ICustomTypeHandler> customTypeConfig = new HashMap<>();
 
-    private String generateGetterName(String fieldName) {
-        return String.format("get%s%s", fieldName.substring(0, 1).toUpperCase(), fieldName.substring(1));
+    public BeanUnitTestConfig getConfiguration() {
+        return configuration;
     }
+
+    public void setConfiguration(BeanUnitTestConfig configuration) {
+        this.configuration = configuration;
+    }
+
+    // private String generateGetterName(String fieldName) {
+    //     return String.format("get%s%s", fieldName.substring(0, 1).toUpperCase(), fieldName.substring(1));
+    // }
 
     private String generateSetterName(String fieldName) {
         return String.format("set%s%s", fieldName.substring(0, 1).toUpperCase(), fieldName.substring(1));
@@ -38,9 +47,9 @@ public class BeanTestGenerator implements CustomTypeRegisterer {
     }
 
     private String generateGetterTestName(Field field) {
-        String fieldName = field.getName();
-        String getterName = generateGetterName(fieldName);
-        return String.format("Getter %s must get %s field", getterName, fieldName);
+        // String fieldName = field.getName();
+        // String getterName = generateGetterName(fieldName);
+        // return String.format("Getter %s must get %s field", getterName, fieldName);
     }
 
     private String generateSetterTestName(Field field) {
